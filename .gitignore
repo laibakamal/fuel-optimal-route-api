@@ -1,0 +1,27 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.egg-info/
+
+# Django
+*.sqlite3
+/staticfiles/
+
+# Secrets
+.env
+
+# Large upstream gazetteer downloads (re-fetched by build_fuel_index).
+# The derived artefact data/stops.json.gz IS committed.
+.cache/
+
+# NOTE: data/geocode_cache.json is deliberately COMMITTED (16 entries, no
+# secrets). It makes `build_fuel_index --no-geocode-fallback` reproduce the full
+# 6,626-stop artefact with zero network calls. Without it, regenerating offline
+# would silently yield 6,610 stops.
+
+# OS / editor
+.DS_Store
+.idea/
+.vscode/
