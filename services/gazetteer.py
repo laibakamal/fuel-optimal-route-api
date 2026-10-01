@@ -229,3 +229,63 @@ class GazetteerIndex:
                         ambiguity_miles=_spread_miles(candidates),
                     )
         return None
+
+
+# ---------------------------------------------------------------------------
+# Place index for resolving user-supplied free-text locations
+# ---------------------------------------------------------------------------
+
+#: GeoNames population floor for inclusion in the committed place index. Census
+#: Places already covers every incorporated place and CDP (32,058 records); this
+#: threshold adds the populated places Census omits without dragging in 163,000
+#: hamlets. Measured artefact size: 407 KiB for Census alone, 672 KiB with this
+#: threshold, 2.4 MiB with no threshold.
+PLACE_INDEX_MIN_POPULATION = 500
+
+
+def build_place_records(
+    census_zip: Path, geonames_zip: Path | None
+) -> list[tuple[str, str, float, float]]:
+    """(name, state, lat, lon) for every place a user might type as an endpoint.
+
+    Separate from the truck-stop resolution tiers because the job is different:
+    there we matched ~3,800 known (city, state) pairs as accurately as possible,
+    here we need broad coverage of whatever a caller types. Shipping this as a
+    committed artefact is what lets free-text input cost zero geocoding calls.
+    """
+    records: list[tuple[str, str, float, float]] = []
+
+    with zipfile.ZipFile(census_zip) as zf:
+        raw = zf.read(CENSUS_MEMBER)
+    for row in csv.DictReader(io.StringIO(raw.decode("latin-1")), delimiter="|"):
+        state = (row.get("USPS") or "").strip().upper()
+        if state not in US_STATES:
+            continue
+        try:
+            records.append(
+                (row["NAME"].strip(), state, round(float(row["INTPTLAT"]), 4),
+                 round(float(row["INTPTLONG"]), 4))
+            )
+        except (KeyError, TypeError, ValueError):
+            continue
+
+    if geonames_zip is not None:
+        with zipfile.ZipFile(geonames_zip) as zf, zf.open(GEONAMES_MEMBER) as fh:
+            for raw_line in io.TextIOWrapper(fh, encoding="utf-8"):
+                parts = raw_line.rstrip("\n").split("\t")
+                if len(parts) < 15 or parts[6] != "P" or parts[7] == "PPLQ":
+                    continue
+                state = parts[10].strip().upper()
+                if state not in US_STATES:
+                    continue
+                try:
+                    if int(parts[14] or 0) < PLACE_INDEX_MIN_POPULATION:
+                        continue
+                    records.append(
+                        (parts[1], state, round(float(parts[4]), 4), round(float(parts[5]), 4))
+                    )
+                except ValueError:
+                    continue
+
+    logger.info("place index: %d records", len(records))
+    return records

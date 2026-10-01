@@ -37,6 +37,12 @@ class Command(BaseCommand):
             "--out", type=Path, default=settings.STOPS_ARTEFACT, help="Output artefact."
         )
         parser.add_argument(
+            "--places-out",
+            type=Path,
+            default=settings.PLACES_ARTEFACT,
+            help="Place index for resolving free-text user locations.",
+        )
+        parser.add_argument(
             "--no-geonames",
             action="store_true",
             help="Census tier only. Skips a ~71 MiB download; lowers the match rate.",
@@ -88,6 +94,7 @@ class Command(BaseCommand):
         self.stdout.write(f"   census keys                          {len(census)}")
 
         tiers = [(gazetteer.SOURCE_CENSUS, census)]
+        geonames_path = None
         if not opts["no_geonames"]:
             geonames_zip = download_if_missing(
                 gazetteer.GEONAMES_URL,
@@ -95,6 +102,7 @@ class Command(BaseCommand):
                 ua,
                 force=opts["force_download"],
             )
+            geonames_path = geonames_zip
             populated, landmarks = gazetteer.load_geonames(geonames_zip)
             self.stdout.write(f"   geonames populated keys              {len(populated)}")
             self.stdout.write(f"   geonames landmark keys               {len(landmarks)}")
@@ -293,5 +301,27 @@ class Command(BaseCommand):
             self.style.SUCCESS(
                 f"\nWrote {out} ({out.stat().st_size / 1024:.1f} KiB) "
                 f"with {len(records)} stops ({us_resolved} US)."
+            )
+        )
+
+        # --- 6. Place index for free-text endpoint resolution ----------------
+        self.stdout.write(self.style.MIGRATE_HEADING("6. Place index"))
+        places = gazetteer.build_place_records(census_zip, geonames_path)
+        places_out: Path = opts["places_out"]
+        places_payload = {
+            "artefact_version": ARTEFACT_VERSION,
+            "census_gazetteer_year": gazetteer.CENSUS_YEAR,
+            "min_geonames_population": gazetteer.PLACE_INDEX_MIN_POPULATION,
+            # Positional rows rather than dicts: the key names would otherwise be
+            # repeated 53,675 times and triple the artefact size.
+            "columns": ["name", "state", "lat", "lon"],
+            "places": [list(record) for record in places],
+        }
+        with gzip.GzipFile(places_out, "wb", mtime=0) as fh:
+            fh.write(json.dumps(places_payload, separators=(",", ":")).encode())
+        self.stdout.write(
+            self.style.SUCCESS(
+                f"   Wrote {places_out} ({places_out.stat().st_size / 1024:.1f} KiB) "
+                f"with {len(places)} places."
             )
         )

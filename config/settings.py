@@ -150,6 +150,7 @@ HTTP_USER_AGENT = os.environ.get(
 DATA_DIR = BASE_DIR / "data"
 CACHE_DIR = BASE_DIR / ".cache"
 STOPS_ARTEFACT = DATA_DIR / "stops.json.gz"
+PLACES_ARTEFACT = DATA_DIR / "places.json.gz"
 FUEL_CSV = DATA_DIR / "fuel-prices-for-be-assessment.csv"
 
 LOGGING = {
