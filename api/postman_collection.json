@@ -1,0 +1,597 @@
+{
+  "info": {
+    "name": "Fuel-Optimal Route API",
+    "description": "Cost-optimal refuelling for a 500-mile-range truck.\n\nStart the server with `make run`, then run these in order. Request 1 shows exactly one routing call and zero geocoding calls in diagnostics.external_calls; request 2 is the same request again and shows zero calls with route_cache_hit true.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://127.0.0.1:8000"
+    }
+  ],
+  "item": [
+    {
+      "name": "1. Happy path - Dallas to Chicago",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/route?start=Dallas, TX&finish=Chicago, IL&geometry=none",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "route"
+          ],
+          "query": [
+            {
+              "key": "start",
+              "value": "Dallas, TX"
+            },
+            {
+              "key": "finish",
+              "value": "Chicago, IL"
+            },
+            {
+              "key": "geometry",
+              "value": "none"
+            }
+          ]
+        },
+        "description": "Expect 200. diagnostics.external_calls == {routing_api: 1, geocoding_api: 0}."
+      }
+    },
+    {
+      "name": "2. Cache hit - same request again",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/route?start=Dallas, TX&finish=Chicago, IL&geometry=none",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "route"
+          ],
+          "query": [
+            {
+              "key": "start",
+              "value": "Dallas, TX"
+            },
+            {
+              "key": "finish",
+              "value": "Chicago, IL"
+            },
+            {
+              "key": "geometry",
+              "value": "none"
+            }
+          ]
+        },
+        "description": "Expect 200 with route_cache_hit true and routing_api 0."
+      }
+    },
+    {
+      "name": "3. Explicit coordinates",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/route?start=32.7767,-96.7970&finish=41.8781,-87.6298&geometry=none",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "route"
+          ],
+          "query": [
+            {
+              "key": "start",
+              "value": "32.7767,-96.7970"
+            },
+            {
+              "key": "finish",
+              "value": "41.8781,-87.6298"
+            },
+            {
+              "key": "geometry",
+              "value": "none"
+            }
+          ]
+        },
+        "description": "lat,lon input. Still zero geocoding calls."
+      }
+    },
+    {
+      "name": "4. POST with a JSON body",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/route",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "route"
+          ]
+        },
+        "description": "Identical semantics to GET.",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"start\": \"Los Angeles, CA\",\n  \"finish\": \"New York, NY\",\n  \"max_detour_miles\": 10,\n  \"geometry\": \"none\"\n}"
+        }
+      }
+    },
+    {
+      "name": "5. Long haul - LA to New York",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/route?start=Los Angeles, CA&finish=New York, NY&geometry=none",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "route"
+          ],
+          "query": [
+            {
+              "key": "start",
+              "value": "Los Angeles, CA"
+            },
+            {
+              "key": "finish",
+              "value": "New York, NY"
+            },
+            {
+              "key": "geometry",
+              "value": "none"
+            }
+          ]
+        },
+        "description": "Note totals.unpriced_origin_miles: the first usable stop is 238.7 mi in, because every California stop in the dataset is in the Imperial Valley. estimated_total_fuel_cost_usd includes that leg."
+      }
+    },
+    {
+      "name": "6. Short trip - inside one tank",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/route?start=Dallas, TX&finish=Fort Worth, TX&geometry=none",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "route"
+          ],
+          "query": [
+            {
+              "key": "start",
+              "value": "Dallas, TX"
+            },
+            {
+              "key": "finish",
+              "value": "Fort Worth, TX"
+            },
+            {
+              "key": "geometry",
+              "value": "none"
+            }
+          ]
+        },
+        "description": "Dallas to Fort Worth. One stop, small purchase."
+      }
+    },
+    {
+      "name": "7. Start equals finish",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/route?start=Dallas, TX&finish=Dallas, TX&geometry=none",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "route"
+          ],
+          "query": [
+            {
+              "key": "start",
+              "value": "Dallas, TX"
+            },
+            {
+              "key": "finish",
+              "value": "Dallas, TX"
+            },
+            {
+              "key": "geometry",
+              "value": "none"
+            }
+          ]
+        },
+        "description": "Zero distance, zero cost, 200 - not an error."
+      }
+    },
+    {
+      "name": "8. Wider detour - 25 miles",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/route?start=Dallas, TX&finish=Chicago, IL&max_detour_miles=25&geometry=none",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "route"
+          ],
+          "query": [
+            {
+              "key": "start",
+              "value": "Dallas, TX"
+            },
+            {
+              "key": "finish",
+              "value": "Chicago, IL"
+            },
+            {
+              "key": "max_detour_miles",
+              "value": "25"
+            },
+            {
+              "key": "geometry",
+              "value": "none"
+            }
+          ]
+        },
+        "description": "More candidate stops. Cost falls or stays equal, never rises."
+      }
+    },
+    {
+      "name": "9. Full geometry",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/route?start=Dallas, TX&finish=Chicago, IL&geometry=full",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "route"
+          ],
+          "query": [
+            {
+              "key": "start",
+              "value": "Dallas, TX"
+            },
+            {
+              "key": "finish",
+              "value": "Chicago, IL"
+            },
+            {
+              "key": "geometry",
+              "value": "full"
+            }
+          ]
+        },
+        "description": "Every coordinate instead of the decimated default. ~9x larger."
+      }
+    },
+    {
+      "name": "10. ERROR 422 - infeasible route",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/route?start=Dallas, TX&finish=Chicago, IL&max_detour_miles=0.1&geometry=none",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "route"
+          ],
+          "query": [
+            {
+              "key": "start",
+              "value": "Dallas, TX"
+            },
+            {
+              "key": "finish",
+              "value": "Chicago, IL"
+            },
+            {
+              "key": "max_detour_miles",
+              "value": "0.1"
+            },
+            {
+              "key": "geometry",
+              "value": "none"
+            }
+          ]
+        },
+        "description": "A 0.1 mi corridor finds almost nothing. Expect application/problem+json, code gap_exceeds_range, with the offending leg named at both ends."
+      }
+    },
+    {
+      "name": "11. ERROR 400 - ambiguous city",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/route?start=Springfield&finish=Chicago, IL",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "route"
+          ],
+          "query": [
+            {
+              "key": "start",
+              "value": "Springfield"
+            },
+            {
+              "key": "finish",
+              "value": "Chicago, IL"
+            }
+          ]
+        },
+        "description": "'Springfield' is in 25 states. The error names real ones."
+      }
+    },
+    {
+      "name": "12. ERROR 400 - outside the USA",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/route?start=51.5074,-0.1278&finish=Chicago, IL",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "route"
+          ],
+          "query": [
+            {
+              "key": "start",
+              "value": "51.5074,-0.1278"
+            },
+            {
+              "key": "finish",
+              "value": "Chicago, IL"
+            }
+          ]
+        },
+        "description": "London coordinates. Expect code outside_us."
+      }
+    },
+    {
+      "name": "13. ERROR 400 - unknown place",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/route?start=Nowhereville, ZZ&finish=Chicago, IL",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "route"
+          ],
+          "query": [
+            {
+              "key": "start",
+              "value": "Nowhereville, ZZ"
+            },
+            {
+              "key": "finish",
+              "value": "Chicago, IL"
+            }
+          ]
+        },
+        "description": "Expect code unresolvable_location."
+      }
+    },
+    {
+      "name": "14. ERROR 400 - validation",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/route?start=Dallas, TX&finish=Chicago, IL&max_detour_miles=500",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "route"
+          ],
+          "query": [
+            {
+              "key": "start",
+              "value": "Dallas, TX"
+            },
+            {
+              "key": "finish",
+              "value": "Chicago, IL"
+            },
+            {
+              "key": "max_detour_miles",
+              "value": "500"
+            }
+          ]
+        },
+        "description": "max_detour_miles above the 50 limit. Expect a per-field errors object."
+      }
+    },
+    {
+      "name": "15. ERROR 405 - wrong method",
+      "request": {
+        "method": "DELETE",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/route?start=Dallas, TX&finish=Chicago, IL&geometry=none",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "route"
+          ],
+          "query": [
+            {
+              "key": "start",
+              "value": "Dallas, TX"
+            },
+            {
+              "key": "finish",
+              "value": "Chicago, IL"
+            },
+            {
+              "key": "geometry",
+              "value": "none"
+            }
+          ]
+        },
+        "description": "DELETE is still a problem document."
+      }
+    },
+    {
+      "name": "16. Map page",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            ""
+          ]
+        },
+        "description": "HTML page rendering the route and stops on Leaflet."
+      }
+    }
+  ]
+}

@@ -1,0 +1,84 @@
+# Fuel-Optimal Route API - example requests
+#
+# Open in VS Code (REST Client extension) or JetBrains HTTP Client and click
+# "Send Request". Equivalent curl commands are in api/curl.sh, and a Postman
+# collection is in api/postman_collection.json.
+#
+# Start the server first:  make run
+
+@host = http://127.0.0.1:8000
+
+### 1. HAPPY PATH - Dallas to Chicago
+# Expect 200. Check diagnostics.external_calls.routing_api == 1
+# and geocoding_api == 0: free-text endpoints resolve from the offline index.
+GET {{host}}/api/v1/route?start=Dallas, TX&finish=Chicago, IL&geometry=none
+Accept: application/json
+
+### 2. CACHE HIT - exactly the same request again
+# Expect 200 with route_cache_hit: true and routing_api: 0.
+GET {{host}}/api/v1/route?start=Dallas, TX&finish=Chicago, IL&geometry=none
+Accept: application/json
+
+### 3. EXPLICIT COORDINATES
+GET {{host}}/api/v1/route?start=32.7767,-96.7970&finish=41.8781,-87.6298&geometry=none
+Accept: application/json
+
+### 4. POST with a JSON body - same semantics as GET
+POST {{host}}/api/v1/route
+Content-Type: application/json
+
+{
+  "start": "Los Angeles, CA",
+  "finish": "New York, NY",
+  "max_detour_miles": 10,
+  "geometry": "none"
+}
+
+### 5. THE LONG ONE - note unpriced_origin_miles in the response
+# The first usable stop is 238.7 mi in, because every California stop in the
+# dataset is in the Imperial Valley while the route runs north-east on I-15.
+# totals.estimated_total_fuel_cost_usd includes that leg; total_fuel_cost_usd
+# is what is provably spent at pumps.
+GET {{host}}/api/v1/route?start=Los Angeles, CA&finish=New York, NY&geometry=none
+Accept: application/json
+
+### 6. SHORT TRIP - inside a single tank
+GET {{host}}/api/v1/route?start=Dallas, TX&finish=Fort Worth, TX&geometry=none
+Accept: application/json
+
+### 7. START EQUALS FINISH - zero distance, zero cost, not an error
+GET {{host}}/api/v1/route?start=Dallas, TX&finish=Dallas, TX&geometry=none
+Accept: application/json
+
+### 8. WIDER DETOUR - more candidate stops, cost falls or stays equal
+GET {{host}}/api/v1/route?start=Dallas, TX&finish=Chicago, IL&max_detour_miles=25&geometry=none
+Accept: application/json
+
+### 9. FULL GEOMETRY - every coordinate, ~9x larger
+GET {{host}}/api/v1/route?start=Dallas, TX&finish=Chicago, IL&geometry=full
+Accept: application/json
+
+### 10. ERROR - infeasible. A 0.1 mi corridor finds almost nothing.
+# Expect 422 application/problem+json, code gap_exceeds_range, with the
+# offending leg named at both ends.
+GET {{host}}/api/v1/route?start=Dallas, TX&finish=Chicago, IL&max_detour_miles=0.1&geometry=none
+Accept: application/json
+
+### 11. ERROR - ambiguous city. Expect 400, names the real states.
+GET {{host}}/api/v1/route?start=Springfield&finish=Chicago, IL
+Accept: application/json
+
+### 12. ERROR - outside the USA. Expect 400, code outside_us.
+GET {{host}}/api/v1/route?start=51.5074,-0.1278&finish=Chicago, IL
+Accept: application/json
+
+### 13. ERROR - unknown place. Expect 400, code unresolvable_location.
+GET {{host}}/api/v1/route?start=Nowhereville, ZZ&finish=Chicago, IL
+Accept: application/json
+
+### 14. ERROR - validation. Expect 400 with a per-field `errors` object.
+GET {{host}}/api/v1/route?start=Dallas, TX&finish=Chicago, IL&max_detour_miles=500
+Accept: application/json
+
+### 15. THE MAP PAGE
+GET {{host}}/
