@@ -1,0 +1,31 @@
+# Optional PostgreSQL for reviewers who want it. The project runs on SQLite with
+# no Docker at all - see README. To use this:
+#
+#   docker compose up -d
+#   echo "DB_ENGINE=postgres" >> .env
+#   python manage.py migrate && python manage.py seed_stops
+#
+# HONEST CAVEAT: this file was authored but NOT executed, because Docker is not
+# installed on the machine this project was built on. The SQLite path is the one
+# that is verified end to end. See README "Known limitations".
+services:
+  db:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-fuelroute}
+      POSTGRES_USER: ${POSTGRES_USER:-fuelroute}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-change-me}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      # Gate `depends_on: service_healthy` so migrate cannot race the server's
+      # first-boot initialisation.
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-fuelroute} -d ${POSTGRES_DB:-fuelroute}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  pgdata:
