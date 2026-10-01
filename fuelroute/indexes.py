@@ -127,9 +127,16 @@ def get_place_index() -> PlaceIndex:
     return _place_index
 
 
-def reset_indexes() -> None:
-    """Drop the cached indexes. For tests, and after a re-seed."""
+def reset_indexes(stops_only: bool = False) -> None:
+    """Drop the cached indexes. For tests, and after a re-seed.
+
+    `stops_only` keeps the place index, which is immutable reference data loaded
+    from a committed artefact. Rebuilding it between tests costs ~250 ms each time
+    and can never change the outcome, whereas the stop index must be rebuilt
+    because the database does change.
+    """
     global _stop_index, _place_index
     with _lock:
         _stop_index = None
-        _place_index = None
+        if not stops_only:
+            _place_index = None

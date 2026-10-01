@@ -1,0 +1,4 @@
+# file: /Users/laibakamal/Documents/Spotter Labs/fuelroute/errors.py
+# hypothesis_version: 6.140.2
+
+['__class__', 'assumptions', 'code', 'default_code', 'detail', 'error', 'errors', 'invalid_request', 'status', 'title', 'type']

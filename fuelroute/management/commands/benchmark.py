@@ -129,9 +129,13 @@ class Command(BaseCommand):
         cold: list[dict] = []
         for origin, destination in ROUTES:
             try:
+                # use_cache=True so the cold pass also populates the in-process
+                # route cache. With use_cache=False the first warm pass went back
+                # to the provider, and the "0 external calls" line below was only
+                # true because the disk fixture quietly absorbed that call.
                 result = plan_route(
                     origin, destination, max_detour_miles=detour,
-                    route_provider=provider, use_cache=False,
+                    route_provider=provider, use_cache=True,
                 )
             except RouteInfeasibleError as exc:
                 self.stdout.write(self.style.WARNING(
@@ -236,7 +240,7 @@ class Command(BaseCommand):
         )
         self.stdout.write(
             f"   external calls, warm passes   {warm_calls}  "
-            f"(expected 0: every route cached)"
+            f"(expected 0: the cold pass populated the route cache)"
         )
 
         target = 200.0

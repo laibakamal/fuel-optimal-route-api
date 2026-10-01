@@ -1,0 +1,14 @@
+[run]
+branch = True
+source = services,fuelroute,config
+omit =
+    */migrations/*
+    */tests/*
+    config/asgi.py
+    config/wsgi.py
+    manage.py
+
+[report]
+# No fail_under and no skip_covered: the README quotes whatever this prints.
+show_missing = True
+precision = 1

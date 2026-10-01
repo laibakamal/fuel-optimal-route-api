@@ -1,0 +1,4 @@
+# file: /Users/laibakamal/Documents/Spotter Labs/fuelroute/serializers.py
+# hypothesis_version: 6.140.2
+
+[0.0, 0.1, 200, 'address', 'city', 'cost_usd', 'detour_miles', 'finish', 'full', 'gallons_purchased', 'latitude', 'longitude', 'name', 'none', 'opis_truckstop_id', 'order', 'price_usd_per_gallon', 'simplified', 'start', 'state']

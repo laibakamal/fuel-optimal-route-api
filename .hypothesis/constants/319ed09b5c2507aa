@@ -1,0 +1,4 @@
+# file: /Users/laibakamal/Documents/Spotter Labs/fuelroute/management/commands/seed_stops.py
+# hypothesis_version: 6.140.2
+
+[1000, '--artefact', '--flush', 'address', 'artefact', 'artefact_version', 'city', 'country', 'flush', 'geocode_source', 'id', 'lat', 'latitude', 'lon', 'longitude', 'name', 'opis_id', 'pk', 'prices', 'rack_id', 'rb', 'state', 'stops', 'store_true']

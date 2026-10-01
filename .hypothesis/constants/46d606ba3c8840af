@@ -1,0 +1,4 @@
+# file: /Users/laibakamal/Documents/Spotter Labs/services/geocode_fallback.py
+# hypothesis_version: 6.140.2
+
+[0.0, 1.1, '1', 'User-Agent', 'countrycodes', 'format', 'json', 'lat', 'limit', 'lon', 'q', 'us']

@@ -8,9 +8,12 @@ import math
 EARTH_RADIUS_MILES = 3958.7613
 METERS_PER_MILE = 1609.344
 
-# Degrees of latitude per mile is very nearly constant; longitude shrinks with
-# latitude. Used to size grid-cell neighbourhoods, never for final distances.
-MILES_PER_DEGREE_LAT = 69.047
+# Miles per degree of latitude. DERIVED from EARTH_RADIUS_MILES rather than
+# hardcoded, so the equirectangular projection used for short-range work and the
+# haversine used for distances cannot disagree. A hardcoded 69.047 differed from
+# what this radius implies by 0.067% - only ~35 ft on a 10-mile detour, far below
+# our ~1.6 mi geocoding error, but an inconsistency with no upside.
+MILES_PER_DEGREE_LAT = EARTH_RADIUS_MILES * math.pi / 180.0
 
 # Generous CONUS + Alaska-free bounding box, used to reject bad joins rather
 # than trust the gazetteer blindly.

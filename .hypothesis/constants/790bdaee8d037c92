@@ -1,0 +1,4 @@
+# file: /Users/laibakamal/Documents/Spotter Labs/services/route_fixtures.py
+# hypothesis_version: 6.140.2
+
+['fixture', 'key', 'last_payload', 'response']

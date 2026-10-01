@@ -1,0 +1,4 @@
+# file: /Users/laibakamal/Documents/Spotter Labs/fuelroute/migrations/0001_initial.py
+# hypothesis_version: 6.140.2
+
+[-180.0, -90.0, 0.0, 90.0, 180.0, 128, 255, '0', 'CA', 'Canada', 'ID', 'Nominatim', 'OPIS Truckstop ID', 'PriceObservation', 'TruckStop', 'US', 'US Census Gazetteer', 'United States', 'address', 'census_gazetteer', 'city', 'constraints', 'country', 'fuelroute.truckstop', 'geocode_source', 'geonames', 'geonames_landmark', 'id', 'indexes', 'latitude', 'latitude__gte', 'latitude__lte', 'longitude', 'longitude__gte', 'longitude__lte', 'name', 'nominatim', 'opis_id', 'ordering', 'price observation', 'price_observations', 'price_usd_per_gallon', 'rack_id', 'state', 'stop', 'truck stop', 'verbose_name']

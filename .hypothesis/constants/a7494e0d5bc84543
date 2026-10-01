@@ -1,0 +1,4 @@
+# file: /Users/laibakamal/Documents/Spotter Labs/fuelroute/urls.py
+# hypothesis_version: 6.140.2
+
+['api/v1/route', 'map', 'route-plan']

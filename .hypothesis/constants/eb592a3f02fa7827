@@ -1,0 +1,4 @@
+# file: /Users/laibakamal/Documents/Spotter Labs/services/fuel_data.py
+# hypothesis_version: 6.140.2
+
+['Address', 'City', 'OPIS Truckstop ID', 'Rack ID', 'Retail Price', 'State', 'Truckstop Name', 'distinct_stops', 'mean', 'median', 'min', 'rows_read', 'utf-8-sig']

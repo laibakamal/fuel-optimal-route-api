@@ -1,0 +1,4 @@
+# file: /Users/laibakamal/Documents/Spotter Labs/fuelroute/views.py
+# hypothesis_version: 6.140.2
+
+[0.0, 3600.0, 'Chicago, IL', 'Dallas, TX', 'GET', 'LineString', 'POST', 'Service not ready', 'assumptions', 'coordinates', 'defaults', 'dependency', 'destination', 'diagnostics', 'external_calls', 'finish', 'fuel_stop_count', 'fuel_stops', 'fuelroute/map.html', 'geometry', 'geometry_detail', 'geometry_point_count', 'infeasibility', 'latitude', 'longitude', 'max_detour_miles', 'origin', 'osrm', 'provider', 'query', 'request', 'resolution_source', 'resolved_label', 'route', 'route_cache_hit', 'start', 'start_tank_gallons', 'stops_indexed', 'stops_not_seeded', 'timings_ms', 'total_distance_miles', 'total_fuel_cost_usd', 'totals', 'type']

@@ -1,0 +1,4 @@
+# file: /Users/laibakamal/Documents/Spotter Labs/services/gazetteer.py
+# hypothesis_version: 6.140.2
+
+[0.0, 10.0, 500, 2025, ' Borough', ' Post Office', ' Town', ' Township', 'ADM3', 'ADM4', 'ADMD', 'ALAND_SQMI', 'INTPTLAT', 'INTPTLONG', 'NAME', 'P', 'PO', 'PPLQ', 'PRK', 'US.txt', 'USPS', 'census_gazetteer', 'geonames', 'geonames_landmark', 'latin-1', 'utf-8', '|']
