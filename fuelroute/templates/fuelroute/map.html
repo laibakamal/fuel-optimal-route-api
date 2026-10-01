@@ -1,0 +1,102 @@
+{% load static %}<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fuel-Optimal Route</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"
+      integrity="sha512-h9FcoyWjHcOcmEVkxOfTLnmZFWIH0iZhZT1H2TbOq55xssQGEJHEaIm+PgoUaZbRvQTNTluNOEfb1ZRy6D3BOw=="
+      crossorigin="anonymous" referrerpolicy="no-referrer">
+<style>
+  :root{
+    --bg:#f6f7f9; --panel:#fff; --ink:#15181d; --muted:#5d6672;
+    --line:#dfe3e8; --accent:#1b5e9c; --warn:#8a5a00; --bad:#9c2a1b;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{ --bg:#14171c; --panel:#1c2128; --ink:#e8eaed; --muted:#9aa4b1;
+           --line:#2c333d; --accent:#6aa8e0; --warn:#e0b060; --bad:#e08070; }
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font:14px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+       color:var(--ink);background:var(--bg)}
+  header{padding:14px 18px;border-bottom:1px solid var(--line);background:var(--panel)}
+  h1{margin:0;font-size:17px;letter-spacing:-.01em}
+  header p{margin:3px 0 0;color:var(--muted);font-size:12.5px}
+  .wrap{display:grid;grid-template-columns:400px 1fr;height:calc(100vh - 62px)}
+  @media (max-width:860px){ .wrap{grid-template-columns:1fr;height:auto} #map{height:60vh} }
+  aside{overflow-y:auto;border-right:1px solid var(--line);background:var(--panel);padding:16px}
+  #map{width:100%;height:100%;min-height:360px;background:var(--bg)}
+  form{display:grid;gap:9px;margin-bottom:14px}
+  label{font-size:12px;color:var(--muted);font-weight:600;letter-spacing:.02em}
+  input,select,button{font:inherit;padding:8px 10px;border:1px solid var(--line);
+       border-radius:7px;background:var(--bg);color:var(--ink);width:100%}
+  button{background:var(--accent);color:#fff;border-color:transparent;font-weight:600;cursor:pointer}
+  button:disabled{opacity:.6;cursor:progress}
+  .row{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+  .cards{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:14px 0}
+  .card{border:1px solid var(--line);border-radius:8px;padding:9px 11px;background:var(--bg)}
+  .card b{display:block;font-size:19px;letter-spacing:-.02em}
+  .card span{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+  table{width:100%;border-collapse:collapse;font-size:12.5px;margin-top:6px}
+  th,td{text-align:left;padding:6px 5px;border-bottom:1px solid var(--line);vertical-align:top}
+  th{font-size:10.5px;text-transform:uppercase;color:var(--muted);letter-spacing:.04em}
+  td.num{text-align:right;font-variant-numeric:tabular-nums}
+  .pill{display:inline-block;padding:1px 7px;border-radius:99px;background:var(--bg);
+        border:1px solid var(--line);font-size:11px;color:var(--muted)}
+  .note{font-size:11.5px;color:var(--muted);margin-top:4px}
+  .err{border:1px solid var(--bad);border-radius:8px;padding:10px 12px;color:var(--bad);
+       background:color-mix(in srgb, var(--bad) 8%, transparent);margin-bottom:12px}
+  .err h3{margin:0 0 4px;font-size:13px}
+  .err pre{margin:6px 0 0;font-size:11px;white-space:pre-wrap;color:var(--muted)}
+  details{margin-top:14px;font-size:12px}
+  summary{cursor:pointer;color:var(--accent);font-weight:600}
+  details pre{background:var(--bg);border:1px solid var(--line);border-radius:7px;
+       padding:9px;overflow-x:auto;font-size:11px;max-height:300px}
+  h2{font-size:12px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);
+     margin:16px 0 0}
+  .marker-pin{background:var(--accent);color:#fff;border-radius:50%;width:22px;height:22px;
+     display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;
+     box-shadow:0 1px 4px rgba(0,0,0,.4)}
+</style>
+</head>
+<body>
+<header>
+  <h1>Fuel-Optimal Route</h1>
+  <p>Cheapest refuelling plan for a 50-gallon tank at 10&nbsp;mpg. One routing call per uncached request.</p>
+</header>
+
+<div class="wrap">
+  <aside>
+    <form id="f">
+      <div>
+        <label for="start">Start</label>
+        <input id="start" name="start" value="{{ defaults.start }}" placeholder="Dallas, TX or 32.7767,-96.7970" required>
+      </div>
+      <div>
+        <label for="finish">Finish</label>
+        <input id="finish" name="finish" value="{{ defaults.finish }}" placeholder="Chicago, IL or 41.8781,-87.6298" required>
+      </div>
+      <div class="row">
+        <div>
+          <label for="detour">Max detour (mi)</label>
+          <input id="detour" name="max_detour_miles" type="number" step="0.5" min="0.1" max="50"
+                 value="{{ defaults.max_detour_miles }}">
+        </div>
+        <div>
+          <label for="tank">Start tank (gal)</label>
+          <input id="tank" name="start_tank_gallons" type="number" step="1" min="0" max="50" value="0">
+        </div>
+      </div>
+      <button type="submit" id="go">Plan route</button>
+    </form>
+    <div id="out"></div>
+  </aside>
+  <div id="map"></div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"
+        integrity="sha512-puJW3E/qXDqYp9IfhAI54BJEaWIfloJ7JWs7OeD5i6ruC9JZL1gERT1wjtwXFlh7CjE7ZJ+/vcRZRkIYIb6p4g=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="{% static 'fuelroute/map.js' %}"></script>
+</body>
+</html>
