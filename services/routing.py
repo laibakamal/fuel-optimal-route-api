@@ -88,6 +88,10 @@ class OsrmRouteProvider:
     session: requests.Session | None = None
     #: Mutable so tests can assert on it without reaching into the transport.
     last_provider: str = field(default="", init=False)
+    #: Raw provider JSON from the most recent successful fetch. Exposed so the
+    #: benchmark's fixture recorder can persist exactly what the service returned,
+    #: rather than re-serialising our parsed form and losing fidelity.
+    last_payload: dict | None = field(default=None, init=False)
 
     def _client(self) -> requests.Session:
         if self.session is None:
@@ -146,6 +150,7 @@ class OsrmRouteProvider:
                 continue
 
             self.last_provider = name
+            self.last_payload = payload
             return _parse_route(payload, provider=name, external_calls=calls)
 
         raise RoutingError(
