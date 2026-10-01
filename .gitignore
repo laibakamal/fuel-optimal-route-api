@@ -9,6 +9,13 @@ venv/
 *.sqlite3
 /staticfiles/
 
+# Coverage data (the .coveragerc config IS tracked; this binary file is not)
+.coverage
+.coverage.*
+htmlcov/
+.pytest_cache/
+.hypothesis/
+
 # Secrets
 .env
 
