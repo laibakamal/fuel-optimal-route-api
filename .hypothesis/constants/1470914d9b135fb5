@@ -1,4 +1,0 @@
-# file: /Users/laibakamal/Documents/Spotter Labs/fuelroute/planner.py
-# hypothesis_version: 6.140.2
-
-[0.0, 1000, 'USD', 'corridor_search', 'currency', 'external_ms', 'geocoding', 'geocoding_api', 'local_compute_ms', 'max_detour_miles', 'miles_per_gallon', 'optimisation', 'price_basis', 'price_basis_note', 'routing', 'routing_api', 'scope_note', 'start_tank_gallons', 'start_tank_note', 'total', 'total_ms', 'vehicle_range_miles']

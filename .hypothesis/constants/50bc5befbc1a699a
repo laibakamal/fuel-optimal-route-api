@@ -1,4 +1,0 @@
-# file: /Users/laibakamal/Documents/Spotter Labs/fuelroute/management/commands/verify_stops.py
-# hypothesis_version: 6.140.2
-
-[0.0, 'Geocode provenance', 'Price validation', 'geocode_source', 'latitude', 'longitude', 'price_observations', 'price_usd_per_gallon']

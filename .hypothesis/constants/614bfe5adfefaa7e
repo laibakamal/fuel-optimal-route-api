@@ -1,4 +1,0 @@
-# file: /Users/laibakamal/Documents/Spotter Labs/services/optimizer.py
-# hypothesis_version: 6.140.2
-
-[0.0, 1e-09, 'from', 'gap_miles', 'inf', 'label', 'mile', 'mpg must be positive', 'route destination', 'route origin', 'to', 'vehicle_range_miles']

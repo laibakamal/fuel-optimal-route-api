@@ -1,4 +1,0 @@
-# file: /Users/laibakamal/Documents/Spotter Labs/services/routing.py
-# hypothesis_version: 6.140.2
-
-[0.0, 20.0, 'NoRoute', 'Ok', 'User-Agent', 'alternatives', 'annotation', 'annotations', 'code', 'coordinates', 'distance', 'duration', 'false', 'fuel-route-api/1.0', 'full', 'generate_hints', 'geojson', 'geometries', 'geometry', 'legs', 'no_route_found', 'osrm-demo', 'osrm-fossgis', 'overview', 'routes', 'routing_failed', 'steps']
