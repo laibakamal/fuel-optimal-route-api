@@ -1,0 +1,9 @@
+# Pinned exactly so a clean clone reproduces what was tested.
+# Django 6.1.1 is the latest stable release (2026-09-02) and requires Python>=3.12.
+Django==6.1.1
+djangorestframework==3.16.1
+requests==2.32.5
+python-dotenv==1.1.1
+
+# Postgres driver. Optional: only imported when DB_ENGINE=postgres.
+psycopg[binary]==3.2.10
