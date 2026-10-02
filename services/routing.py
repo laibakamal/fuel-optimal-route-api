@@ -84,7 +84,7 @@ class OsrmRouteProvider:
     base_url: str
     fallback_url: str = ""
     timeout_seconds: float = 20.0
-    user_agent: str = "fuel-route-api/1.0"
+    user_agent: str = "fuel-optimal-route-api/1.0"
     session: requests.Session | None = None
     #: Mutable so tests can assert on it without reaching into the transport.
     last_provider: str = field(default="", init=False)

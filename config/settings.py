@@ -144,7 +144,7 @@ OSRM_FALLBACK_BASE_URL = os.environ.get(
 OSRM_TIMEOUT_SECONDS = _env_float("OSRM_TIMEOUT_SECONDS", 20.0)
 HTTP_USER_AGENT = os.environ.get(
     "HTTP_USER_AGENT",
-    "fuel-route-api/1.0 (backend assessment; contact: see repo README)",
+    "fuel-optimal-route-api/1.0 (backend assessment; contact: see repo README)",
 )
 
 DATA_DIR = BASE_DIR / "data"

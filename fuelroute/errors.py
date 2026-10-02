@@ -27,7 +27,7 @@ logger = logging.getLogger(__name__)
 PROBLEM_CONTENT_TYPE = "application/problem+json"
 #: Stable, documented URIs. They do not have to resolve to be useful as
 #: identifiers, but they namespace our error types away from anyone else's.
-PROBLEM_TYPE_BASE = "https://github.com/spotter-fuel-route/errors"
+PROBLEM_TYPE_BASE = "https://github.com/laibakamal/fuel-optimal-route-api/errors"
 
 
 def problem_response(
