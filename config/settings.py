@@ -56,6 +56,14 @@ MIDDLEWARE = [
     "django.middleware.gzip.GZipMiddleware",  # route geometry compresses ~8x
 ]
 
+# Django defaults this to "same-origin", which strips the Referer from every
+# cross-origin request. The OpenStreetMap tile servers answer refererless
+# browser traffic with a 200 carrying an "Access blocked" placeholder PNG
+# (6,987 bytes) instead of the tile (18,733 bytes), so the map page rendered a
+# grid of error tiles under a correct route. Sending the origin — not the path —
+# satisfies the tile usage policy. This is also the modern browser default.
+SECURE_REFERRER_POLICY = "strict-origin-when-cross-origin"
+
 ROOT_URLCONF = "config.urls"
 WSGI_APPLICATION = "config.wsgi.application"
 
